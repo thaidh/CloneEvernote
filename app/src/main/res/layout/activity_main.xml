@@ -11,14 +11,14 @@
         android:id="@+id/btnAppendPhoto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Photo" />
+        android:text="Text" />
 
     <Button
         android:id="@+id/btnSave"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/btnAppendPhoto"
-        android:text="Save" />
+        android:text="Photo" />
 
     <Button
         android:id="@+id/btnLoad"
@@ -36,12 +36,20 @@
         android:background="@color/material_blue_grey_800"
         android:paddingBottom="@dimen/activity_horizontal_margin">
 
-        <EditText
-            android:id="@+id/etMessage"
+        <LinearLayout
+            android:id="@+id/diary_content"
             android:layout_width="match_parent"
-            android:layout_height="fill_parent"
-            android:paddingLeft="@dimen/default_padding"
-            android:paddingRight="@dimen/default_padding"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+        <!--<EditText-->
+            <!--android:id="@+id/etMessage"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="fill_parent"-->
+            <!--android:paddingLeft="@dimen/default_padding"-->
+            <!--android:paddingRight="@dimen/default_padding"/>-->
 
 
     </ScrollView>

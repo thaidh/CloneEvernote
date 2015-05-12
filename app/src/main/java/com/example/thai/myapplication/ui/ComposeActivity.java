@@ -8,14 +8,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Editable;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.Menu;
@@ -24,24 +19,25 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.example.thai.myapplication.CustomImageSpan;
 import com.example.thai.myapplication.R;
-import com.example.thai.myapplication.database.DatabaseHelper;
-import com.example.thai.myapplication.model.DiaryItem;
+import com.example.thai.myapplication.customview.CustomEditText;
 
 import net.londatiga.android.ActionItem;
 import net.londatiga.android.QuickAction;
 
+import java.util.ArrayList;
 import java.util.Random;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 public class ComposeActivity extends Activity {
+    private static final String TAG = ComposeActivity.class.getSimpleName();
     private static final int ID_ADD = 1;
     private static final int ID_ACCEPT = 2;
     private static final int ID_UPLOAD = 3;
@@ -51,7 +47,6 @@ public class ComposeActivity extends Activity {
     private Button btnLoad;
     private ScrollView scrollView;
 
-    private EditText etMessage;
 
     private static final String IMAGE_SPAN = "<img src=\"%d\"/>";
     private static final String IMAGE_SPAN_REGEX = "<img src=\"(-?\\d+)\"/>";
@@ -62,6 +57,12 @@ public class ComposeActivity extends Activity {
     private int mImageSpanWidth;
 
     private QuickAction mQuickAction;
+    private LinearLayout mContent;
+    private CustomEditText.OnKeyDeleteListener onKeyDeleteListener;
+
+    private ArrayList<View> viewContentArray = new ArrayList<View>();
+    private Random random = new Random();
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -107,66 +108,44 @@ public class ComposeActivity extends Activity {
 
 
             scrollView = (ScrollView) findViewById(R.id.scrollView);
+            mContent = (LinearLayout) findViewById(R.id.diary_content);
 
-            etMessage = (EditText) findViewById(R.id.etMessage);
-            etMessage.setBackgroundColor(Color.TRANSPARENT);
-            etMessage.setTextColor(Color.GRAY);
-            etMessage.requestFocus();
-//            etMessage.setMovementMethod(new ClickableMovementMethod());
-            etMessage.addTextChangedListener(new TextWatcher() {
+            onKeyDeleteListener = new CustomEditText.OnKeyDeleteListener() {
                 @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    Log.i("AAAAA","Before text change:" + s + " " + start + " " + count);
-                    int selectPos = etMessage.getSelectionStart();
-//                    Char
-//                    ImageSpan[] arrayOfImageSpan = s.getSpans(0, editTable.length(), ImageSpan.class);
-
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable editTable) {
-                    Matcher matcher = imageSpanFinder.matcher(editTable);
-
-                    int i = 0;
-                    ImageSpan[] arrayOfImageSpan = editTable.getSpans(0, editTable.length(), ImageSpan.class);
-                    int j = arrayOfImageSpan.length;
-                    while (true) {
-                        if (i >= j) {
-                            int posToFind = 0;
-                            while (matcher.find(posToFind)) {
-                                int start = matcher.start();
-                                int end = matcher.end();
-                                int value = Integer.parseInt(matcher.group(1));
-
-                                posToFind = end < (editTable.length()-1) ? end : (editTable.length()-1);
-
-                                editTable.setSpan(createImageSpan(value), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                public void onKeyDeletePressed(EditText curEditText) {
+                    Log.i(TAG, "On key delete in");
+                    int previousIndex = viewContentArray.indexOf(curEditText) - 1;
+                    if (previousIndex >= 0) {
+                        View previousView = viewContentArray.get(previousIndex);
+                        if (previousView instanceof EditText) {
+                            EditText editText = (EditText)previousView;
+                            Log.i(TAG, "Merge edit text");
+                            if (!TextUtils.isEmpty(curEditText.getText())) {
+                                editText.append(curEditText.getText());
                             }
-
-                            break;
+                            previousView.requestFocus();
+                            editText.setSelection(editText.getText().length());
+                            mContent.removeView(curEditText);
+                            viewContentArray.remove(curEditText);
+                        } else if (previousView instanceof  ImageView) {
+                            mContent.removeView(previousView);
+                            viewContentArray.remove(previousView);
+                            if (TextUtils.isEmpty(curEditText.getText())) {
+                                onKeyDeletePressed(curEditText);
+                            }
+                            Toast.makeText(getApplicationContext(), "Delete image view", Toast.LENGTH_SHORT).show();
                         }
-                        editTable.removeSpan(arrayOfImageSpan[i]);
-                        i++;
                     }
-
-
                 }
-            });
+            };
 
             btnText = (Button) findViewById(R.id.btnAppendPhoto);
             btnText.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int pos = etMessage.getSelectionStart();
-                    String generateImageSpan = String.format(IMAGE_SPAN, new Random().nextInt());
-
-                    etMessage.setText(etMessage.getText().insert(pos, generateImageSpan));
-                    etMessage.setSelection(pos + generateImageSpan.length());
+                    EditText customEditText = createEditText(onKeyDeleteListener);
+                    viewContentArray.add(customEditText);
+                    mContent.addView(customEditText);
                 }
             });
 
@@ -176,11 +155,39 @@ public class ComposeActivity extends Activity {
 
                 @Override
                 public void onClick(View v) {
-                    CharSequence content = etMessage.getText();
-                    DatabaseHelper.getInstance(getApplicationContext()).insertDiary(new DiaryItem(-1, content.toString(), System.currentTimeMillis()));
-                    //clear text
-                    finish();
+                    EditText selectedEditText = null;
+                    for (View view : viewContentArray) {
+                        if (view instanceof EditText) {
+                            if (view.isFocused()) {
+                                selectedEditText = ((EditText) view);
+                                break;
+                            }
+                        }
+                    }
+                    String msgInNewEditText = "";
+                    if (selectedEditText != null) {
+                        String msg = selectedEditText.getText().toString();
+                        if (!TextUtils.isEmpty(msg)) {
+                            int breakIndex = selectedEditText.getSelectionStart();
+                            if (breakIndex > 0 && breakIndex < (msg.length() - 1)) {
+                                msgInNewEditText = msg.substring(breakIndex);
+                                selectedEditText.setText(msg.substring(0, breakIndex));
+                            } else {
+                                msgInNewEditText = msg;
+                                selectedEditText.setText("");
+                            }
+                        }
+                    }
 
+                    ImageView imageView = createImageView();
+                    viewContentArray.add(imageView);
+                    mContent.addView(imageView);
+
+
+                    EditText customEditText = createEditText(onKeyDeleteListener);
+                    customEditText.setText(msgInNewEditText);
+                    viewContentArray.add(customEditText);
+                    mContent.addView(customEditText);
                 }
             });
 
@@ -188,18 +195,32 @@ public class ComposeActivity extends Activity {
             btnLoad.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String diary = DatabaseHelper.getInstance(getApplicationContext()).getLastDiary();
-                    if (!TextUtils.isEmpty(diary)) {
-                        etMessage.setText(diary);
-                    } else {
-                        Toast.makeText(getApplicationContext(), "No data", Toast.LENGTH_SHORT).show();
-                    }
+
                 }
             });
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
+    }
+
+    public EditText createEditText(CustomEditText.OnKeyDeleteListener onKeyDeleteListener) {
+        CustomEditText customEditText = new CustomEditText(getApplicationContext());
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        customEditText.setLayoutParams(layoutParams);
+        customEditText.setBackgroundColor(Color.TRANSPARENT);
+//        customEditText.setText("ABCDEFGHG");
+        customEditText.requestFocus();
+        customEditText.setOnKeyDeleteListener(onKeyDeleteListener);
+        return customEditText;
+    }
+
+    public ImageView createImageView() {
+        ImageView imageView = new ImageView(getApplicationContext());
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        imageView.setImageDrawable(getRandomDrawable(random.nextInt(1000) + 1));
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        return imageView;
     }
 
     private void scrollToBottom() {
@@ -236,6 +257,7 @@ public class ComposeActivity extends Activity {
 
     private Drawable getRandomDrawable(int random) {
 //        int random = new Random().nextInt();
+
         switch (random % 4) {
             case 1:
                 return getResources().getDrawable(R.drawable.demo1);
@@ -294,3 +316,51 @@ public class ComposeActivity extends Activity {
         return bitmap;
     }
 }
+
+//            etMessage = (EditText) findViewById(R.id.etMessage);
+//            etMessage.setBackgroundColor(Color.TRANSPARENT);
+//            etMessage.setTextColor(Color.GRAY);
+//            etMessage.requestFocus();
+//            etMessage.addTextChangedListener(new TextWatcher() {
+//                @Override
+//                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//                    Log.i("AAAAA","Before text change:" + s + " " + start + " " + count);
+//                    int selectPos = etMessage.getSelectionStart();
+//
+//
+//                }
+//
+//                @Override
+//                public void onTextChanged(CharSequence s, int start, int before, int count) {
+//
+//                }
+//
+//                @Override
+//                public void afterTextChanged(Editable editTable) {
+//                    Matcher matcher = imageSpanFinder.matcher(editTable);
+//
+//                    int i = 0;
+//                    ImageSpan[] arrayOfImageSpan = editTable.getSpans(0, editTable.length(), ImageSpan.class);
+//                    int j = arrayOfImageSpan.length;
+//                    while (true) {
+//                        if (i >= j) {
+//                            int posToFind = 0;
+//                            while (matcher.find(posToFind)) {
+//                                int start = matcher.start();
+//                                int end = matcher.end();
+//                                int value = Integer.parseInt(matcher.group(1));
+//
+//                                posToFind = end < (editTable.length()-1) ? end : (editTable.length()-1);
+//
+//                                editTable.setSpan(createImageSpan(value), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                            }
+//
+//                            break;
+//                        }
+//                        editTable.removeSpan(arrayOfImageSpan[i]);
+//                        i++;
+//                    }
+//
+//
+//                }
+//            });
