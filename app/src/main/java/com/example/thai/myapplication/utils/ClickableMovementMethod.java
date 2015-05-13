@@ -1,4 +1,4 @@
-package com.example.thai.myapplication;
+package com.example.thai.myapplication.utils;
 
 import android.text.Layout;
 import android.text.Selection;

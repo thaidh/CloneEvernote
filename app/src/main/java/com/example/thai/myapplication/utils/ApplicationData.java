@@ -1,4 +1,4 @@
-package com.example.thai.myapplication;
+package com.example.thai.myapplication.utils;
 
 /**
  * Created by Thai on 12/14/2014.

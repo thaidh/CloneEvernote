@@ -1,11 +1,10 @@
-package com.example.thai.myapplication;
+package com.example.thai.myapplication.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.net.Uri;
 import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.View;
