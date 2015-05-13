@@ -11,14 +11,14 @@
         android:id="@+id/btnAppendPhoto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Text" />
+        android:text="Add photo" />
 
     <Button
         android:id="@+id/btnSave"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/btnAppendPhoto"
-        android:text="Photo" />
+        android:text="Save" />
 
     <Button
         android:id="@+id/btnLoad"
@@ -36,20 +36,14 @@
         android:background="@color/material_blue_grey_800"
         android:paddingBottom="@dimen/activity_horizontal_margin">
 
-        <LinearLayout
+        <com.example.thai.myapplication.customview.MyComposer
             android:id="@+id/diary_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:animateLayoutChanges="true">
 
-        </LinearLayout>
-
-        <!--<EditText-->
-            <!--android:id="@+id/etMessage"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="fill_parent"-->
-            <!--android:paddingLeft="@dimen/default_padding"-->
-            <!--android:paddingRight="@dimen/default_padding"/>-->
+        </com.example.thai.myapplication.customview.MyComposer>
 
 
     </ScrollView>
