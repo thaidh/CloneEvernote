@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class DiaryListActivity extends Activity {
+public class DiaryListActivity extends ActionBarActivity {
     private static final String EXTRA_ID_DIARY = "extra_diary_id";
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     private ArrayList<DiaryItem> diaryList;
@@ -30,8 +31,15 @@ public class DiaryListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_diary_list);
+        setupToolbar();
 
         lvDiary = (ListView) findViewById(R.id.lvDiary);
+    }
+
+    private void setupToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
+        toolbar.setTitle("My Diary");
+        setSupportActionBar(toolbar);
     }
 
     @Override

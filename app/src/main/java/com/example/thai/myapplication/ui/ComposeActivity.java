@@ -1,10 +1,11 @@
 package com.example.thai.myapplication.ui;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +23,7 @@ import net.londatiga.android.QuickAction;
 import java.util.regex.Pattern;
 
 
-public class ComposeActivity extends Activity {
+public class ComposeActivity extends ActionBarActivity {
     private static final String TAG = ComposeActivity.class.getSimpleName();
     private static final int ID_ADD = 1;
     private static final int ID_ACCEPT = 2;
@@ -49,7 +50,7 @@ public class ComposeActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         try {
             super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_main);
+            setContentView(R.layout.activity_new_note);
 
             WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
             Point size = new Point();
@@ -114,10 +115,19 @@ public class ComposeActivity extends Activity {
                     Toast.makeText(getApplicationContext(), "Load", Toast.LENGTH_SHORT).show();
                 }
             });
+
+            setupToolbar();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
+    }
+
+    private void setupToolbar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.my_awesome_toolbar);
+        toolbar.setTitle("Compose Diary");
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void scrollToBottom() {
@@ -144,8 +154,13 @@ public class ComposeActivity extends Activity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == android.R.id.home) {
             finish();
+            return true;
+        }
+
+        if (id == R.id.action_settings) {
+
             return true;
         }
 

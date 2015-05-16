@@ -17,3 +17,13 @@ allprojects {
         jcenter()
     }
 }
+
+//subprojects {
+//    GLOBAL_BUILD_TOOL_VERSION = '19.1.0';
+//    GLOBAL_COMPILE_SDK_VERSION = 22;
+//}
+
+subprojects {
+    ext.global_compileSdkVersion = 22
+    ext.global_buildToolsVersion = "19.1.0"
+}

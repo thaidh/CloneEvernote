@@ -121,7 +121,7 @@ public class MyComposer extends LinearLayout {
         CustomEditText customEditText = new CustomEditText(getContext());
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         customEditText.setLayoutParams(layoutParams);
-        customEditText.setTextColor(Color.WHITE);
+        customEditText.setTextColor(getResources().getColor(R.color.primary_color));
         customEditText.setBackgroundColor(Color.TRANSPARENT);
         customEditText.requestFocus();
         customEditText.setOnKeyDeleteListener(onKeyDeleteListener);

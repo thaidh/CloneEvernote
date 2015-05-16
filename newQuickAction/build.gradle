@@ -1,8 +1,8 @@
 //apply plugin: 'com.android.application'
 apply plugin: 'com.android.library'
 android {
-    compileSdkVersion 10
-    buildToolsVersion "19.1.0"
+    compileSdkVersion global_compileSdkVersion
+    buildToolsVersion global_buildToolsVersion
 
 //    defaultConfig {
 //        applicationId "net.londatiga.android"
@@ -14,4 +14,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+}
+
+dependencies {
 }

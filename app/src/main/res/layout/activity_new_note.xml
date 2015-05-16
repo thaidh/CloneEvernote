@@ -1,0 +1,59 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/my_awesome_toolbar"
+        layout="@layout/layout_toolbar"/>
+
+    <LinearLayout
+        android:id="@+id/function_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/my_awesome_toolbar"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnAppendPhoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add photo"
+            />
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"/>
+
+        <Button
+            android:id="@+id/btnLoad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Load"/>
+    </LinearLayout>
+
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/function_bar"
+        android:background="@color/material_blue_grey_800"
+        android:paddingBottom="@dimen/activity_horizontal_margin">
+
+        <com.example.thai.myapplication.customview.MyComposer
+            android:id="@+id/diary_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical">
+
+        </com.example.thai.myapplication.customview.MyComposer>
+
+
+    </ScrollView>
+
+
+</RelativeLayout>
