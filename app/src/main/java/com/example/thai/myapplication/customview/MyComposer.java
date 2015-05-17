@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.example.thai.myapplication.R;
+import com.example.thai.myapplication.utils.Utils;
 
 import net.londatiga.android.QuickAction;
 
@@ -132,7 +133,7 @@ public class MyComposer extends LinearLayout {
         ImageView imageView = new ImageView(getContext());
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         imageView.setLayoutParams(layoutParams);
-        imageView.setImageDrawable(getRandomDrawable(random.nextInt(1000) + 1));
+        imageView.setImageDrawable(Utils.getRandomDrawable(getContext(), random.nextInt(1000) + 1));
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         imageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -146,21 +147,7 @@ public class MyComposer extends LinearLayout {
         return imageView;
     }
 
-    private Drawable getRandomDrawable(int random) {
 
-        switch (random % 4) {
-            case 1:
-                return getResources().getDrawable(R.drawable.demo1);
-            case 2:
-                return getResources().getDrawable(R.drawable.demo2);
-
-            case 3:
-                return getResources().getDrawable(R.drawable.demo3);
-
-            default:
-                return getResources().getDrawable(R.drawable.demo4);
-        }
-    }
 
     public void setQuickAction(QuickAction mQuickAction) {
         this.mQuickAction = mQuickAction;

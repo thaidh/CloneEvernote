@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:padding="10.0dip">
+
+    <TextView
+        android:id="@+id/tv_diary_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="title"
+        android:textSize="20.0dip"
+        android:layout_toLeftOf="@+id/imv_diary_preview"
+        android:layout_marginBottom="5.0dip"/>
+
+    <TextView
+        android:id="@+id/tv_diary_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_diary_title"
+        android:maxLines="3"
+        android:layout_toLeftOf="@+id/imv_diary_preview"
+        android:text="dsadsadsadkjhaskjdhasjkdhjkashdjkashdjkdaskjdhjksahdjkashdjkhasjkdhasjkddhsajkdhjsadhasjkddaslkjdlasjdkljaskldjaksljdklasjdkldklsajdlkasjkdljaskldjklas"
+        android:layout_marginBottom="20.0dip"/>
+
+    <ImageView
+        android:id="@+id/imv_diary_preview"
+        android:layout_width="100.0dip"
+        android:layout_height="80.0dip"
+        android:src="@drawable/demo1"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="5.0dip"
+        android:scaleType="centerCrop"/>
+
+
+</RelativeLayout>
