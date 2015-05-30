@@ -4,7 +4,6 @@
     tools:context="com.example.thai.myapplication.ui.DiaryListActivity">
     <item
         android:id="@+id/action_settings"
-        android:title="@string/action_settings"
-        android:orderInCategory="100"
-        app:showAsAction="never" />
+        android:title="@string/menu_new_diary"
+        app:showAsAction="always|withText" />
 </menu>

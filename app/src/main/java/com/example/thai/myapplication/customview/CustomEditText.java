@@ -2,6 +2,7 @@ package com.example.thai.myapplication.customview;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.EditText;
 
@@ -26,6 +27,7 @@ public class CustomEditText extends EditText {
 
     @Override
     public boolean onKeyPreIme(int keyCode, KeyEvent event) {
+        Log.i("AAA", "Key hit: " + keyCode);
         if (keyCode == KeyEvent.KEYCODE_DEL && event.getAction() == KeyEvent.ACTION_DOWN && getSelectionStart() == 0) {
             if (onKeyDeleteListener != null) {
                 onKeyDeleteListener.onKeyDeletePressed(this);
@@ -34,6 +36,7 @@ public class CustomEditText extends EditText {
         }
         return super.onKeyPreIme(keyCode, event);
     }
+
 
     public void setOnKeyDeleteListener(OnKeyDeleteListener onKeyDeleteListener) {
         this.onKeyDeleteListener = onKeyDeleteListener;
