@@ -33,7 +33,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void createEventTable() {
         if (!isExistTable(TABLE_EVENT)) {
-            db.execSQL("CREATE TABLE " + TABLE_EVENT + " (id INTEGER PRIMARY KEY AUTOINCREMENT, content, create_time)");
+            db.execSQL("CREATE TABLE " + TABLE_EVENT + " (id INTEGER PRIMARY KEY AUTOINCREMENT, content, create_time, desc, thumb)");
         }
     }
 
@@ -66,9 +66,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             db.execSQL("INSERT INTO "
                             + TABLE_EVENT
-                            + " (content, create_time)"
-                            + " VALUES (?, ?)",
-                    new String[]{diary.content, diary.createTime + ""});
+                            + " (content, create_time, desc, thumb)"
+                            + " VALUES (?, ?, ?, ?)",
+                    new String[]{diary.getContent(), diary.getCreateTime() + "", diary.getDescription(), diary.getThumbPath()});
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -93,7 +93,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             int id = cursor.getInt(cursor.getColumnIndex("id"));
             String content = cursor.getString(cursor.getColumnIndex("content"));
             long createTime = cursor.getLong(cursor.getColumnIndex("create_time"));
-            DiaryItem diary = new DiaryItem(id, content, createTime);
+            String des = cursor.getString(cursor.getColumnIndex("desc"));
+            String thumb = cursor.getString(cursor.getColumnIndex("thumb"));
+            DiaryItem diary = new DiaryItem(id, content, createTime, des, thumb);
             arrDiary.add(diary);
         };
         return arrDiary;

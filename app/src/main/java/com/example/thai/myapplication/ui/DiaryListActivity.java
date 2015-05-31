@@ -9,8 +9,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListView;
 
+import com.androidquery.AQuery;
 import com.example.thai.myapplication.R;
 import com.example.thai.myapplication.adapter.DiaryListAdapter;
 import com.example.thai.myapplication.database.DatabaseHelper;
@@ -25,6 +25,7 @@ public class DiaryListActivity extends ActionBarActivity {
     private RecyclerView mRecyclerView;
     private DiaryListAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+    private AQuery mAQ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,10 +33,11 @@ public class DiaryListActivity extends ActionBarActivity {
         setContentView(R.layout.activity_diary_list);
         setupToolbar();
 
+        mAQ = new AQuery(this);
         mRecyclerView = (RecyclerView) findViewById(R.id.lvDiary);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new DiaryListAdapter(diaryList);
+        mAdapter = new DiaryListAdapter(diaryList, mAQ);
         mRecyclerView.setAdapter(mAdapter);
     }
 

@@ -3,6 +3,7 @@ package com.example.thai.myapplication.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.androidquery.AQuery;
 import com.example.thai.myapplication.R;
 import com.example.thai.myapplication.model.DiaryItem;
 import com.example.thai.myapplication.ui.ComposeActivity;
@@ -28,8 +30,10 @@ public class DiaryListAdapter extends RecyclerView.Adapter<DiaryListAdapter.View
     private Context mContext;
     private ArrayList<DiaryItem> mDataSet;
     private Calendar cal;
+    private AQuery mAQ;
 
-    public DiaryListAdapter(ArrayList<DiaryItem> dataSet) {
+    public DiaryListAdapter(ArrayList<DiaryItem> dataSet, AQuery aquery) {
+        this.mAQ = aquery;
         this.mDataSet = dataSet;
         this.cal = Calendar.getInstance();
     }
@@ -49,10 +53,16 @@ public class DiaryListAdapter extends RecyclerView.Adapter<DiaryListAdapter.View
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
         final DiaryItem diaryItem = mDataSet.get(i);
-        cal.setTimeInMillis(diaryItem.createTime);
+        cal.setTimeInMillis(diaryItem.getCreateTime());
         viewHolder.mTitle.setText(simpleDateFormat.format(cal.getTime()));
+        if (TextUtils.isEmpty(diaryItem.getThumbPath())) {
+            viewHolder.mImageView.setVisibility(View.GONE);
+        } else {
+            mAQ.id(viewHolder.mImageView).image(diaryItem.getThumbPath());
+            viewHolder.mImageView.setVisibility(View.VISIBLE);
+        }
         viewHolder.mImageView.setImageDrawable(Utils.getRandomDrawable(mContext, i));
-        viewHolder.mContent.setText(diaryItem.getContent());
+        viewHolder.mContent.setText(diaryItem.getDescription());
         viewHolder.setItemClickListener(new ItemClickListener() {
             @Override
             public void onItemClick(View v, int pos) {

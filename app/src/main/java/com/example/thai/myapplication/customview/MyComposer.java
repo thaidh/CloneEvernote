@@ -10,9 +10,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.androidquery.AQuery;
+import com.androidquery.callback.ImageOptions;
 import com.example.thai.myapplication.R;
+import com.example.thai.myapplication.database.DatabaseHelper;
+import com.example.thai.myapplication.model.DiaryItem;
 import com.example.thai.myapplication.utils.JsonUtils;
-import com.example.thai.myapplication.utils.Utils;
 
 import net.londatiga.android.QuickAction;
 
@@ -35,13 +38,13 @@ public class MyComposer extends LinearLayout {
     private Random random = new Random();
     private String mContent;
     private EditText mEditText;
+    private AQuery mAQ;
 
     private static final String IMAGE_SPAN = "<img src=\"%d\"/>";
     private static final String IMAGE_SPAN_REGEX = "<img src=\"(-?\\d+)\"/>";
     private static final Pattern imageSpanFinder = Pattern.compile(IMAGE_SPAN_REGEX);
 
-
-
+    private static final ImageOptions noFileCache = new ImageOptions();
 
     public MyComposer(Context context) {
         this(context, null);
@@ -49,6 +52,8 @@ public class MyComposer extends LinearLayout {
 
     public MyComposer(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mAQ = new AQuery(context);
+        noFileCache.fileCache = false;
         init();
     }
 
@@ -85,7 +90,7 @@ public class MyComposer extends LinearLayout {
     }
 
 
-    public void addPhotoToSelectedPosition() {
+    public void addPhotoToSelectedPosition(String path) {
         EditText selectedEditText = null;
         int selectedIndex = -1;
         String msgInNewEditText = "";
@@ -116,7 +121,7 @@ public class MyComposer extends LinearLayout {
             }
 
             int newImageIndex = selectedIndex + 1;
-            ImageView imageView = createImageView();
+            ImageView imageView = createImageView(path);
             viewContentArray.add(newImageIndex, imageView);
             addView(imageView, newImageIndex);
 
@@ -139,109 +144,64 @@ public class MyComposer extends LinearLayout {
         return customEditText;
     }
 
-    private ImageView createImageView() {
+
+    private ImageView createImageView(String localPath) {
         ImageView imageView = new ImageView(getContext());
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         imageView.setLayoutParams(layoutParams);
-        int sourceDrawable = random.nextInt(1000) + 1;
-        imageView.setImageDrawable(Utils.getRandomDrawable(getContext(), sourceDrawable));
+        imageView.setTag(localPath);
+        mAQ.id(imageView).image(localPath, new ImageOptions());
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        imageView.setTag(sourceDrawable);
-        imageView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (mQuickAction != null) {
-                    mQuickAction.show(v);
-                }
-                return false;
-            }
-        });
+        imageView.setTag(localPath);
         return imageView;
     }
-
-
 
     public void setQuickAction(QuickAction mQuickAction) {
         this.mQuickAction = mQuickAction;
     }
 
-    //            etMessage = (EditText) findViewById(R.id.etMessage);
-//            etMessage.setBackgroundColor(Color.TRANSPARENT);
-//            etMessage.setTextColor(Color.GRAY);
-//            etMessage.requestFocus();
-//            etMessage.addTextChangedListener(new TextWatcher() {
-//                @Override
-//                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//                    Log.i("AAAAA","Before text change:" + s + " " + start + " " + count);
-//                    int selectPos = etMessage.getSelectionStart();
-//
-//
-//                }
-//
-//                @Override
-//                public void onTextChanged(CharSequence s, int start, int before, int count) {
-//
-//                }
-//
-//                @Override
-//                public void afterTextChanged(Editable editTable) {
-//                    Matcher matcher = imageSpanFinder.matcher(editTable);
-//
-//                    int i = 0;
-//                    ImageSpan[] arrayOfImageSpan = editTable.getSpans(0, editTable.length(), ImageSpan.class);
-//                    int j = arrayOfImageSpan.length;
-//                    while (true) {
-//                        if (i >= j) {
-//                            int posToFind = 0;
-//                            while (matcher.find(posToFind)) {
-//                                int start = matcher.start();
-//                                int end = matcher.end();
-//                                int value = Integer.parseInt(matcher.group(1));
-//
-//                                posToFind = end < (editTable.length()-1) ? end : (editTable.length()-1);
-//
-//                                editTable.setSpan(createImageSpan(value), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-//                            }
-//
-//                            break;
-//                        }
-//                        editTable.removeSpan(arrayOfImageSpan[i]);
-//                        i++;
-//                    }
-//
-//
-//                }
-//            });
-    //todo may be used
 
     private static final int EDIT_TEXT_TYPE = 1;
     private static final int IMAGE_VIEW_TYPE = 2;
 
 
+    public void exportData() {
 
-    public String exportData() {
-        JSONArray jsonContent = new JSONArray();
         try {
+            boolean isSetDesc = false;
+            boolean isSetThumb = false;
+            DiaryItem item = new DiaryItem();
+            JSONArray jsonContent = new JSONArray();
             for (View view : viewContentArray) {
-                if (view instanceof  EditText) {
+                if (view instanceof EditText) {
                     JSONObject jsonItemEditText = new JSONObject();
                     jsonItemEditText.put(JsonUtils.TYPE, EDIT_TEXT_TYPE);
-                    jsonItemEditText.put(JsonUtils.CONTENT, ((EditText) view).getText());
+                    CharSequence curText = ((EditText) view).getText();
+                    jsonItemEditText.put(JsonUtils.CONTENT, curText);
                     jsonContent.put(jsonItemEditText);
+                    if (!isSetDesc && !TextUtils.isEmpty(curText)) {
+                        item.setDescription(curText.toString());
+                        isSetDesc = true;
+                    }
 
                 } else if (view instanceof ImageView) {
+                    String imagePath = (String) ((ImageView) view).getTag();
                     JSONObject jsonItemImageView = new JSONObject();
                     jsonItemImageView.put(JsonUtils.TYPE, IMAGE_VIEW_TYPE);
-                    jsonItemImageView.put(JsonUtils.CONTENT, ((ImageView) view).getTag());
+                    jsonItemImageView.put(JsonUtils.CONTENT, imagePath);
                     jsonContent.put(jsonItemImageView);
+                    if (!isSetThumb) {
+                        item.setThumbPath(imagePath);
+                        isSetThumb = true;
+                    }
                 }
             }
-        } catch (JSONException e) {
+            item.setContent(jsonContent.toString());
+            item.setCreateTime(System.currentTimeMillis());
+            DatabaseHelper.getInstance(getContext()).insertDiary(item);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-
-        return jsonContent.toString();
     }
 
     public void importData(String jsonContent) {
@@ -259,13 +219,14 @@ public class MyComposer extends LinearLayout {
                         addView(editText);
                         break;
                     case IMAGE_VIEW_TYPE:
-                        ImageView imageView = createImageView();
+                        String path = jsonItem.getString(JsonUtils.CONTENT);
+                        ImageView imageView = createImageView(path);
                         viewContentArray.add(imageView);
                         addView(imageView);
                         break;
                 }
             }
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
