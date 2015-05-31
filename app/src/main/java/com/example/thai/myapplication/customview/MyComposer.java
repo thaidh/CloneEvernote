@@ -2,6 +2,7 @@ package com.example.thai.myapplication.customview;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.v7.internal.widget.ViewUtils;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -16,6 +17,7 @@ import com.example.thai.myapplication.R;
 import com.example.thai.myapplication.database.DatabaseHelper;
 import com.example.thai.myapplication.model.DiaryItem;
 import com.example.thai.myapplication.utils.JsonUtils;
+import com.example.thai.myapplication.utils.Utils;
 
 import net.londatiga.android.QuickAction;
 
@@ -147,7 +149,10 @@ public class MyComposer extends LinearLayout {
 
     private ImageView createImageView(String localPath) {
         ImageView imageView = new ImageView(getContext());
+//        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(Utils.convertDpToPixel(200, getContext()), Utils.convertDpToPixel(200, getContext()));
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        int margin = Utils.convertDpToPixel(20, getContext());
+        layoutParams.setMargins(margin, margin, margin, margin);
         imageView.setLayoutParams(layoutParams);
         imageView.setTag(localPath);
         mAQ.id(imageView).image(localPath, new ImageOptions());
